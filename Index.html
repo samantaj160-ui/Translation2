@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Translation Tool</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Translator Box -->
+        <div class="box">
+
+            <h2>🌐 Language Translation Tool</h2>
+
+            <textarea id="inputText"
+                placeholder="Enter text to translate..."></textarea>
+
+            <div class="language-section">
+
+                <select id="sourceLang">
+                    <option value="auto">🔍 Auto Detect</option>
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="bn">Bengali</option>
+                    <option value="fr">French</option>
+                    <option value="es">Spanish</option>
+                    <option value="de">German</option>
+                    <option value="it">Italian</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ko">Korean</option>
+                    <option value="zh-CN">Chinese</option>
+                    <option value="ru">Russian</option>
+                </select>
+
+                <select id="targetLang">
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="bn">Bengali</option>
+                    <option value="fr">French</option>
+                    <option value="es">Spanish</option>
+                    <option value="de">German</option>
+                    <option value="it">Italian</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ko">Korean</option>
+                    <option value="zh-CN">Chinese</option>
+                    <option value="ru">Russian</option>
+                </select>
+
+            </div>
+
+            <p id="detectedLanguage"></p>
+
+            <button onclick="translateText()">Translate</button>
+
+            <button onclick="copyText()">Copy Translation</button>
+
+            <button onclick="speakText()">🔊 Text To Speech</button>
+
+            <textarea id="outputText"
+                placeholder="Translated text..."
+                readonly></textarea>
+
+        </div>
+
+
+        <!-- History Box -->
+        <div class="history-box">
+
+            <div class="history-header">
+                <h2>📜 Translation History</h2>
+
+                <button class="clear-btn"
+                    onclick="clearHistory()">
+                    Clear All
+                </button>
+            </div>
+
+            <div id="historyList">
+                <p>No history available.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
