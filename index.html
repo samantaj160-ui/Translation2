@@ -4,91 +4,304 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Language Translation Tool</title>
-    <link rel="stylesheet" href="style.css">
+
+    <title>LinguaTranslate</title>
+
+    <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
 
-    <div class="container">
+    <div class="app-container">
 
-        <!-- Translator Box -->
-        <div class="box">
+        <!-- HEADER -->
+        <header class="header">
 
-            <h2>🌐 Language Translation Tool</h2>
+            <div class="brand">
+                <div class="logo-icon">🌐</div>
 
-            <textarea id="inputText"
-                placeholder="Enter text to translate..."></textarea>
+                <div>
+                    <h1>LinguaTranslate</h1>
+                    <p>Translate • Speak • Understand</p>
+                </div>
+            </div>
 
-            <div class="language-section">
+            <div class="status">
+                <span class="status-dot"></span>
+                Online
+            </div>
 
-                <select id="sourceLang">
-                    <option value="auto">🔍 Auto Detect</option>
-                    <option value="en">English</option>
-                    <option value="hi">Hindi</option>
-                    <option value="bn">Bengali</option>
-                    <option value="fr">French</option>
-                    <option value="es">Spanish</option>
-                    <option value="de">German</option>
-                    <option value="it">Italian</option>
-                    <option value="ja">Japanese</option>
-                    <option value="ko">Korean</option>
-                    <option value="zh-CN">Chinese</option>
-                    <option value="ru">Russian</option>
-                </select>
+        </header>
 
-                <select id="targetLang">
-                    <option value="en">English</option>
-                    <option value="hi">Hindi</option>
-                    <option value="bn">Bengali</option>
-                    <option value="fr">French</option>
-                    <option value="es">Spanish</option>
-                    <option value="de">German</option>
-                    <option value="it">Italian</option>
-                    <option value="ja">Japanese</option>
-                    <option value="ko">Korean</option>
-                    <option value="zh-CN">Chinese</option>
-                    <option value="ru">Russian</option>
-                </select>
+
+        <!-- MAIN TRANSLATOR -->
+        <main class="translator-card">
+
+            <div class="card-title">
+                <h2>Language Translator</h2>
+                <p>Translate text between multiple languages</p>
+            </div>
+
+
+            <!-- LANGUAGE SELECTORS -->
+            <div class="language-row">
+
+                <div class="language-box">
+
+                    <label for="sourceLang">From</label>
+
+                    <select id="sourceLang">
+                        <option value="auto">🌐 Auto Detect</option>
+                        <option value="en">English</option>
+                        <option value="hi">Hindi</option>
+                        <option value="bn">Bengali</option>
+                        <option value="ta">Tamil</option>
+                        <option value="te">Telugu</option>
+                        <option value="mr">Marathi</option>
+                        <option value="gu">Gujarati</option>
+                        <option value="pa">Punjabi</option>
+                        <option value="ur">Urdu</option>
+                        <option value="fr">French</option>
+                        <option value="es">Spanish</option>
+                        <option value="de">German</option>
+                        <option value="it">Italian</option>
+                        <option value="pt">Portuguese</option>
+                        <option value="ru">Russian</option>
+                        <option value="ja">Japanese</option>
+                        <option value="ko">Korean</option>
+                        <option value="zh-CN">Chinese</option>
+                        <option value="ar">Arabic</option>
+                    </select>
+
+                </div>
+
+
+                <!-- SWAP BUTTON -->
+
+                <button
+                    class="swap-button"
+                    id="swapButton"
+                    title="Swap languages and text"
+                    aria-label="Swap languages and text">
+                    ⇄
+                </button>
+
+
+                <div class="language-box">
+
+                    <label for="targetLang">To</label>
+
+                    <select id="targetLang">
+
+                        <option value="en">English</option>
+                        <option value="hi">Hindi</option>
+                        <option value="bn">Bengali</option>
+                        <option value="ta">Tamil</option>
+                        <option value="te">Telugu</option>
+                        <option value="mr">Marathi</option>
+                        <option value="gu">Gujarati</option>
+                        <option value="pa">Punjabi</option>
+                        <option value="ur">Urdu</option>
+                        <option value="fr">French</option>
+                        <option value="es">Spanish</option>
+                        <option value="de">German</option>
+                        <option value="it">Italian</option>
+                        <option value="pt">Portuguese</option>
+                        <option value="ru">Russian</option>
+                        <option value="ja">Japanese</option>
+                        <option value="ko">Korean</option>
+                        <option value="zh-CN">Chinese</option>
+                        <option value="ar">Arabic</option>
+
+                    </select>
+
+                </div>
 
             </div>
 
-            <p id="detectedLanguage"></p>
 
-            <button onclick="translateText()">Translate</button>
+            <!-- ERROR / STATUS MESSAGE -->
 
-            <button onclick="copyText()">Copy Translation</button>
+            <div id="errorBox" class="message-box hidden">
+                <span id="messageIcon">⚠️</span>
 
-            <button onclick="speakText()">🔊 Text To Speech</button>
+                <div>
+                    <strong id="messageTitle">Something went wrong</strong>
+                    <p id="messageText"></p>
+                </div>
 
-            <textarea id="outputText"
-                placeholder="Translated text..."
-                readonly></textarea>
-
-        </div>
-
-
-        <!-- History Box -->
-        <div class="history-box">
-
-            <div class="history-header">
-                <h2>📜 Translation History</h2>
-
-                <button class="clear-btn"
-                    onclick="clearHistory()">
-                    Clear All
+                <button id="closeMessage" class="close-message">
+                    ×
                 </button>
             </div>
 
-            <div id="historyList">
-                <p>No history available.</p>
+
+            <!-- TRANSLATION AREA -->
+
+            <div class="translation-area">
+
+                <!-- INPUT -->
+
+                <div class="text-panel">
+
+                    <div class="panel-header">
+
+                        <span>Original Text</span>
+
+                        <span id="detectedLanguage">
+                            Ready
+                        </span>
+
+                    </div>
+
+                    <textarea
+                        id="inputText"
+                        placeholder="Enter text here..."
+                        maxlength="5000">
+                    </textarea>
+
+
+                    <div class="panel-bottom">
+
+                        <span id="charCount">
+                            0 / 5000
+                        </span>
+
+                        <div class="voice-controls">
+
+                            <button
+                                id="micButton"
+                                class="icon-button"
+                                title="Speak"
+                                aria-label="Speak">
+                                🎤
+                            </button>
+
+                            <button
+                                id="clearInput"
+                                class="icon-button"
+                                title="Clear text"
+                                aria-label="Clear text">
+                                ✕
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- OUTPUT -->
+
+                <div class="text-panel">
+
+                    <div class="panel-header">
+
+                        <span>Translation</span>
+
+                        <span id="translationStatus">
+                            Ready
+                        </span>
+
+                    </div>
+
+                    <textarea
+                        id="outputText"
+                        placeholder="Translation will appear here..."
+                        readonly>
+                    </textarea>
+
+
+                    <div class="panel-bottom">
+
+                        <span id="translationInfo">
+                            Ready
+                        </span>
+
+                        <div class="voice-controls">
+
+                            <button
+                                id="copyButton"
+                                class="icon-button"
+                                title="Copy translation"
+                                aria-label="Copy translation">
+                                📋
+                            </button>
+
+                            <button
+                                id="speakerButton"
+                                class="icon-button"
+                                title="Listen to translation"
+                                aria-label="Listen to translation">
+                                🔊
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
             </div>
 
-        </div>
+
+            <!-- TRANSLATE BUTTON -->
+
+            <button
+                id="translateButton"
+                class="translate-button">
+
+                <span>Translate</span>
+                <span>→</span>
+
+            </button>
+
+
+            <!-- HISTORY -->
+
+            <section class="history-section">
+
+                <div class="history-header">
+
+                    <div>
+                        <h3>Translation History</h3>
+                        <p>Your recent translations</p>
+                    </div>
+
+                    <button
+                        id="clearHistory"
+                        class="clear-history">
+                        Clear All
+                    </button>
+
+                </div>
+
+                <div id="historyList" class="history-list">
+
+                    <div class="empty-history">
+                        <div>📝</div>
+                        <p>No translation history yet</p>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+
+        <!-- FOOTER -->
+
+        <footer>
+            <p>LinguaTranslate • Built with HTML, CSS & JavaScript</p>
+        </footer>
 
     </div>
 
-    <script src="script.js"></script>
+
+    <script src="./script.js"></script>
 
 </body>
+
 </html>
