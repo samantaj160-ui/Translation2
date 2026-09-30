@@ -3,6 +3,7 @@
 // ==========================================
 
 const languageNames = {
+
     auto: "Auto Detect",
 
     en: "English",
@@ -30,7 +31,7 @@ const languageNames = {
 
 
 // ==========================================
-// GET HTML ELEMENTS
+// ELEMENTS
 // ==========================================
 
 const inputText = document.getElementById("inputText");
@@ -39,29 +40,21 @@ const outputText = document.getElementById("outputText");
 const sourceLang = document.getElementById("sourceLang");
 const targetLang = document.getElementById("targetLang");
 
-const translateButton =
-    document.getElementById("translateButton");
+const translateButton = document.getElementById("translateButton");
 
-const swapButton =
-    document.getElementById("swapButton");
+const swapButton = document.getElementById("swapButton");
 
-const micButton =
-    document.getElementById("micButton");
+const micButton = document.getElementById("micButton");
 
-const speakerButton =
-    document.getElementById("speakerButton");
+const speakerButton = document.getElementById("speakerButton");
 
-const copyButton =
-    document.getElementById("copyButton");
+const copyButton = document.getElementById("copyButton");
 
-const clearInput =
-    document.getElementById("clearInput");
+const clearInput = document.getElementById("clearInput");
 
-const charCount =
-    document.getElementById("charCount");
+const charCount = document.getElementById("charCount");
 
-const detectedLanguage =
-    document.getElementById("detectedLanguage");
+const detectedLanguage = document.getElementById("detectedLanguage");
 
 const translationStatus =
     document.getElementById("translationStatus");
@@ -135,27 +128,21 @@ function hideMessage() {
 }
 
 
-if (closeMessage) {
-    closeMessage.addEventListener("click", hideMessage);
-}
+closeMessage.addEventListener("click", hideMessage);
 
 
 // ==========================================
 // CHARACTER COUNTER
 // ==========================================
 
-if (inputText) {
+inputText.addEventListener("input", function () {
 
-    inputText.addEventListener("input", function () {
+    const length = inputText.value.length;
 
-        const length = inputText.value.length;
+    charCount.textContent = `${length} / 5000`;
 
-        charCount.textContent =
-            `${length} / 5000`;
-
-        hideMessage();
-    });
-}
+    hideMessage();
+});
 
 
 // ==========================================
@@ -170,7 +157,7 @@ async function translateText() {
     const target = targetLang.value;
 
 
-    // Empty text
+    // Validate input
 
     if (!text) {
 
@@ -185,7 +172,7 @@ async function translateText() {
     }
 
 
-    // Same language
+    // Prevent same language
 
     if (source !== "auto" && source === target) {
 
@@ -198,23 +185,19 @@ async function translateText() {
     }
 
 
-    // Loading
+    // Start loading
 
     translateButton.disabled = true;
 
     translateButton.innerHTML =
-        "<span>Translating...</span><span>⏳</span>";
+        "<span>Translating...</span> ⏳";
 
     outputText.value = "Translating...";
 
-    translationStatus.textContent =
-        "Working...";
+    translationStatus.textContent = "Working...";
+    translationInfo.textContent = "Please wait";
 
-    translationInfo.textContent =
-        "Please wait";
-
-    detectedLanguage.textContent =
-        "Detecting...";
+    detectedLanguage.textContent = "Detecting...";
 
     hideMessage();
 
@@ -224,30 +207,24 @@ async function translateText() {
         let sourceLanguage = source;
 
 
-        // Automatic detection
+        // Automatic language detection
 
         if (source === "auto") {
 
-            sourceLanguage =
-                await detectLanguage(text);
+            sourceLanguage = await detectLanguage(text);
         }
 
 
         detectedLanguage.textContent =
             "Detected: " +
-            (
-                languageNames[sourceLanguage]
-                || sourceLanguage
-            );
+            (languageNames[sourceLanguage] || sourceLanguage);
 
 
-        // Language pair
+        // API language pair
 
         const langPair =
             sourceLanguage + "|" + target;
 
-
-        // MyMemory API
 
         const url =
             "https://api.mymemory.translated.net/get" +
@@ -257,25 +234,19 @@ async function translateText() {
             encodeURIComponent(langPair);
 
 
-        // Timeout
+        // Timeout protection
 
         const controller =
             new AbortController();
 
         const timeout =
-            setTimeout(
-                () => controller.abort(),
-                15000
-            );
+            setTimeout(() => controller.abort(), 15000);
 
 
         const response =
-            await fetch(
-                url,
-                {
-                    signal: controller.signal
-                }
-            );
+            await fetch(url, {
+                signal: controller.signal
+            });
 
 
         clearTimeout(timeout);
@@ -309,16 +280,12 @@ async function translateText() {
             data.responseData.translatedText;
 
 
-        // Show result
+        // Show translation
 
-        outputText.value =
-            translation;
+        outputText.value = translation;
 
-        translationStatus.textContent =
-            "Complete";
-
-        translationInfo.textContent =
-            "Translation ready";
+        translationStatus.textContent = "Complete";
+        translationInfo.textContent = "Translation ready";
 
 
         // Save history
@@ -340,13 +307,11 @@ async function translateText() {
 
     } catch (error) {
 
-        console.error(
-            "Translation error:",
-            error
-        );
+        console.error(error);
 
 
         outputText.value = "";
+
 
         translationStatus.textContent =
             "Unavailable";
@@ -388,17 +353,14 @@ async function translateText() {
 }
 
 
-if (translateButton) {
-
-    translateButton.addEventListener(
-        "click",
-        translateText
-    );
-}
+translateButton.addEventListener(
+    "click",
+    translateText
+);
 
 
 // ==========================================
-// AUTOMATIC LANGUAGE DETECTION
+// LANGUAGE DETECTION
 // ==========================================
 
 async function detectLanguage(text) {
@@ -441,7 +403,7 @@ async function detectLanguage(text) {
         if (!response.ok) {
 
             throw new Error(
-                "Language detection failed"
+                "Detection failed"
             );
         }
 
@@ -472,86 +434,74 @@ async function detectLanguage(text) {
 
 
 // ==========================================
-// SWAP LANGUAGES AND TEXT
+// SWAP LANGUAGES + TEXT
 // ==========================================
 
-if (swapButton) {
+swapButton.addEventListener(
+    "click",
+    function () {
 
-    swapButton.addEventListener(
-        "click",
-        function () {
+        // Auto detect cannot be swapped directly
 
-            // Auto Detect cannot be swapped directly
+        if (sourceLang.value === "auto") {
 
-            if (sourceLang.value === "auto") {
+            showMessage(
+                "Cannot swap Auto Detect",
+                "Translate the text first, or select a specific source language before swapping.",
+                "info"
+            );
 
-                showMessage(
-                    "Cannot swap Auto Detect",
-                    "Select a specific source language before using swap.",
-                    "info"
-                );
-
-                return;
-            }
-
-
-            // Save old values
-
-            const oldSource =
-                sourceLang.value;
-
-            const oldTarget =
-                targetLang.value;
-
-            const oldInput =
-                inputText.value;
-
-            const oldOutput =
-                outputText.value;
-
-
-            // Swap languages
-
-            sourceLang.value =
-                oldTarget;
-
-            targetLang.value =
-                oldSource;
-
-
-            // Swap text
-
-            inputText.value =
-                oldOutput;
-
-            outputText.value =
-                oldInput;
-
-
-            // Update character counter
-
-            charCount.textContent =
-                `${inputText.value.length} / 5000`;
-
-
-            detectedLanguage.textContent =
-                "Ready";
-
-            translationStatus.textContent =
-                "Ready";
-
-            translationInfo.textContent =
-                "Swapped";
-
-
-            hideMessage();
+            return;
         }
-    );
-}
+
+
+        // Swap languages
+
+        const oldSource =
+            sourceLang.value;
+
+        sourceLang.value =
+            targetLang.value;
+
+        targetLang.value =
+            oldSource;
+
+
+        // Swap text
+
+        const oldInput =
+            inputText.value;
+
+        inputText.value =
+            outputText.value;
+
+        outputText.value =
+            oldInput;
+
+
+        // Update counter
+
+        charCount.textContent =
+            `${inputText.value.length} / 5000`;
+
+
+        detectedLanguage.textContent =
+            "Ready";
+
+        translationStatus.textContent =
+            "Ready";
+
+        translationInfo.textContent =
+            "Swapped";
+
+
+        hideMessage();
+    }
+);
 
 
 // ==========================================
-// SPEECH RECOGNITION / MICROPHONE
+// MICROPHONE / SPEECH TO TEXT
 // ==========================================
 
 const SpeechRecognition =
@@ -567,6 +517,7 @@ if (SpeechRecognition) {
     recognition =
         new SpeechRecognition();
 
+
     recognition.continuous = false;
 
     recognition.interimResults = false;
@@ -574,84 +525,60 @@ if (SpeechRecognition) {
     recognition.maxAlternatives = 1;
 
 
-    if (micButton) {
+    micButton.addEventListener(
+        "click",
+        startVoiceInput
+    );
 
-        micButton.addEventListener(
-            "click",
-            startVoiceInput
-        );
-    }
 
 } else {
 
-    if (micButton) {
+    micButton.addEventListener(
+        "click",
+        function () {
 
-        micButton.addEventListener(
-            "click",
-            function () {
+            showMessage(
+                "Voice input not supported",
+                "Your browser does not support speech recognition. Try Google Chrome or Microsoft Edge."
+            );
 
-                showMessage(
-                    "Voice input not supported",
-                    "Your browser does not support speech recognition. Try Google Chrome."
-                );
-            }
-        );
-    }
+        }
+    );
 }
 
-
-// ==========================================
-// START VOICE INPUT
-// ==========================================
 
 function startVoiceInput() {
 
     if (!recognition) return;
 
 
-    let language =
+    const language =
         sourceLang.value;
 
 
-    // Auto Detect speech fallback
+    // Auto detect cannot specify speech language
 
     if (language === "auto") {
 
-        language = "en";
-
-        showMessage(
-            "Listening",
-            "Speak in English, or select your speech language before using the microphone.",
-            "info"
-        );
+        recognition.lang = "en-US";
 
     } else {
 
-        showMessage(
-            "Listening...",
-            "Speak clearly into your microphone.",
-            "info"
-        );
+        recognition.lang =
+            getSpeechLanguage(language);
     }
 
 
-    recognition.lang =
-        getSpeechLanguage(language);
+    recognition.start();
 
 
-    try {
+    micButton.textContent = "🔴";
 
-        recognition.start();
-
-        micButton.textContent =
-            "🔴";
-
-    } catch (error) {
-
-        console.log(
-            "Microphone already active."
-        );
-    }
+    showMessage(
+        "Listening...",
+        "Speak clearly into your microphone.",
+        "info"
+    );
 
 
     recognition.onresult =
@@ -669,11 +596,7 @@ function startVoiceInput() {
                 `${transcript.length} / 5000`;
 
 
-            showMessage(
-                "Voice captured",
-                "Your speech has been converted to text.",
-                "success"
-            );
+            hideMessage();
         };
 
 
@@ -681,51 +604,22 @@ function startVoiceInput() {
         function (event) {
 
             console.error(
-                "Speech recognition error:",
+                "Speech error:",
                 event.error
             );
 
 
-            micButton.textContent =
-                "🎤";
-
-
-            if (event.error === "not-allowed") {
-
-                showMessage(
-                    "Microphone permission denied",
-                    "Allow microphone access in your browser settings and try again."
-                );
-
-            } else if (event.error === "no-speech") {
-
-                showMessage(
-                    "No speech detected",
-                    "Please speak clearly and try again."
-                );
-
-            } else if (event.error === "network") {
-
-                showMessage(
-                    "Voice service unavailable",
-                    "Check your internet connection and try again."
-                );
-
-            } else {
-
-                showMessage(
-                    "Voice input failed",
-                    "The browser could not recognize your speech."
-                );
-            }
+            showMessage(
+                "Voice input failed",
+                "Microphone access may be blocked or speech could not be recognized."
+            );
         };
 
 
     recognition.onend =
         function () {
 
-            micButton.textContent =
-                "🎤";
+            micButton.textContent = "🎤";
         };
 }
 
@@ -739,41 +633,25 @@ function getSpeechLanguage(language) {
     const speechLanguages = {
 
         en: "en-US",
-
         hi: "hi-IN",
-
         bn: "bn-IN",
-
         ta: "ta-IN",
-
         te: "te-IN",
-
         mr: "mr-IN",
-
         gu: "gu-IN",
-
         pa: "pa-IN",
-
         ur: "ur-IN",
 
         fr: "fr-FR",
-
         es: "es-ES",
-
         de: "de-DE",
-
         it: "it-IT",
-
         pt: "pt-PT",
 
         ru: "ru-RU",
-
         ja: "ja-JP",
-
         ko: "ko-KR",
-
         "zh-CN": "zh-CN",
-
         ar: "ar-SA"
     };
 
@@ -787,194 +665,134 @@ function getSpeechLanguage(language) {
 // TEXT TO SPEECH
 // ==========================================
 
-if (speakerButton) {
+speakerButton.addEventListener(
+    "click",
+    function () {
 
-    speakerButton.addEventListener(
-        "click",
-        speakTranslation
-    );
-}
-
-
-function speakTranslation() {
-
-    const text =
-        outputText.value.trim();
+        const text =
+            outputText.value.trim();
 
 
-    // Empty output
-
-    if (!text) {
-
-        showMessage(
-            "Nothing to play",
-            "Translate some text first."
-        );
-
-        return;
-    }
-
-
-    // Browser support
-
-    if (
-        !("speechSynthesis" in window) ||
-        !("SpeechSynthesisUtterance" in window)
-    ) {
-
-        showMessage(
-            "Voice output not supported",
-            "Your browser does not support text-to-speech."
-        );
-
-        return;
-    }
-
-
-    // Stop existing speech
-
-    window.speechSynthesis.cancel();
-
-
-    const utterance =
-        new SpeechSynthesisUtterance(text);
-
-
-    // Set output language
-
-    let speechLanguage =
-        targetLang.value;
-
-
-    if (speechLanguage === "auto") {
-
-        speechLanguage = "en";
-    }
-
-
-    utterance.lang =
-        getSpeechLanguage(
-            speechLanguage
-        );
-
-
-    utterance.rate = 0.85;
-
-    utterance.pitch = 1;
-
-    utterance.volume = 1;
-
-
-    // Change icon
-
-    speakerButton.textContent =
-        "⏹️";
-
-
-    utterance.onstart =
-        function () {
-
-            translationInfo.textContent =
-                "Speaking...";
-        };
-
-
-    utterance.onend =
-        function () {
-
-            speakerButton.textContent =
-                "🔊";
-
-            translationInfo.textContent =
-                "Translation ready";
-        };
-
-
-    utterance.onerror =
-        function (event) {
-
-            console.error(
-                "Text-to-speech error:",
-                event
-            );
-
-
-            speakerButton.textContent =
-                "🔊";
-
-
-            translationInfo.textContent =
-                "Voice unavailable";
-
+        if (!text) {
 
             showMessage(
-                "Voice playback failed",
-                "Check your phone volume and browser speech settings, then try again."
+                "Nothing to read",
+                "Translate some text first."
             );
-        };
+
+            return;
+        }
 
 
-    // Speak
+        if (!("speechSynthesis" in window)) {
 
-    window.speechSynthesis.speak(
-        utterance
-    );
-}
+            showMessage(
+                "Text-to-speech unavailable",
+                "Your browser does not support text-to-speech."
+            );
 
-
-// ==========================================
-// COPY TRANSLATION
-// ==========================================
-
-if (copyButton) {
-
-    copyButton.addEventListener(
-        "click",
-        copyTranslation
-    );
-}
+            return;
+        }
 
 
-async function copyTranslation() {
+        // Stop previous speech
 
-    const text =
-        outputText.value.trim();
+        speechSynthesis.cancel();
 
 
-    if (!text) {
+        const speech =
+            new SpeechSynthesisUtterance(text);
 
-        showMessage(
-            "Nothing to copy",
-            "Translate something first."
-        );
 
-        return;
+        speech.lang =
+            getSpeechLanguage(
+                targetLang.value
+            );
+
+
+        speech.rate = 0.9;
+
+        speech.pitch = 1;
+
+
+        speech.onstart =
+            function () {
+
+                speakerButton.textContent =
+                    "⏹️";
+            };
+
+
+        speech.onend =
+            function () {
+
+                speakerButton.textContent =
+                    "🔊";
+            };
+
+
+        speech.onerror =
+            function () {
+
+                speakerButton.textContent =
+                    "🔊";
+
+                showMessage(
+                    "Speech failed",
+                    "The browser could not read the translation aloud."
+                );
+            };
+
+
+        speechSynthesis.speak(speech);
+
+
+        // Clicking again stops speech
+
+        speakerButton.onclick =
+            function () {
+
+                speechSynthesis.cancel();
+
+                speakerButton.textContent =
+                    "🔊";
+
+                speakerButton.onclick =
+                    arguments.callee;
+            };
     }
+);
 
 
-    try {
+// ==========================================
+// COPY
+// ==========================================
 
-        await navigator.clipboard.writeText(
-            text
-        );
+copyButton.addEventListener(
+    "click",
+    async function () {
 
-
-        showMessage(
-            "Copied",
-            "Translation copied to clipboard.",
-            "success"
-        );
+        const text =
+            outputText.value.trim();
 
 
-    } catch (error) {
+        if (!text) {
 
-        // Fallback
+            showMessage(
+                "Nothing to copy",
+                "Translate something first."
+            );
+
+            return;
+        }
+
 
         try {
 
-            outputText.select();
+            await navigator.clipboard.writeText(
+                text
+            );
 
-            document.execCommand("copy");
 
             showMessage(
                 "Copied",
@@ -982,7 +800,8 @@ async function copyTranslation() {
                 "success"
             );
 
-        } catch (copyError) {
+
+        } catch (error) {
 
             showMessage(
                 "Copy failed",
@@ -990,37 +809,34 @@ async function copyTranslation() {
             );
         }
     }
-}
+);
 
 
 // ==========================================
 // CLEAR INPUT
 // ==========================================
 
-if (clearInput) {
+clearInput.addEventListener(
+    "click",
+    function () {
 
-    clearInput.addEventListener(
-        "click",
-        function () {
+        inputText.value = "";
 
-            inputText.value = "";
+        charCount.textContent =
+            "0 / 5000";
 
-            charCount.textContent =
-                "0 / 5000";
+        detectedLanguage.textContent =
+            "Ready";
 
-            detectedLanguage.textContent =
-                "Ready";
+        hideMessage();
 
-            hideMessage();
-
-            inputText.focus();
-        }
-    );
-}
+        inputText.focus();
+    }
+);
 
 
 // ==========================================
-// SAVE HISTORY
+// HISTORY
 // ==========================================
 
 function saveHistory(
@@ -1056,7 +872,7 @@ function saveHistory(
     history.unshift(item);
 
 
-    // Keep maximum 20 records
+    // Keep last 20
 
     history =
         history.slice(0, 20);
@@ -1101,90 +917,61 @@ function displayHistory() {
 
     historyList.innerHTML =
         history.map(
-            (item, index) => {
+            (item, index) => `
 
-                const sourceName =
-                    languageNames[item.source]
-                    || item.source
-                    || "Unknown";
+            <div class="history-item">
 
-                const targetName =
-                    languageNames[item.target]
-                    || item.target
-                    || "Unknown";
+                <div class="history-languages">
+                    ${escapeHTML(
+                        languageNames[item.source]
+                        || item.source
+                    )}
 
+                    →
 
-                return `
+                    ${escapeHTML(
+                        languageNames[item.target]
+                        || item.target
+                    )}
+                </div>
 
-                <div class="history-item">
+                <div class="history-original">
+                    ${escapeHTML(
+                        item.original
+                    )}
+                </div>
 
-                    <div class="history-languages">
+                <div class="history-translation">
+                    ${escapeHTML(
+                        item.translation
+                    )}
+                </div>
 
-                        ${escapeHTML(sourceName)}
+                <small>
+                    ${escapeHTML(item.date)}
+                </small>
 
-                        →
+                <div class="history-actions">
 
-                        ${escapeHTML(targetName)}
+                    <button
+                        onclick="useHistory(${index})">
+                        ↻ Use
+                    </button>
 
-                    </div>
+                    <button
+                        onclick="copyHistory(${index})">
+                        📋 Copy
+                    </button>
 
-
-                    <div class="history-original">
-
-                        Input:
-                        ${escapeHTML(item.original)}
-
-                    </div>
-
-
-                    <div class="history-translation">
-
-                        Output:
-                        ${escapeHTML(item.translation)}
-
-                    </div>
-
-
-                    <small>
-
-                        ${escapeHTML(
-                            item.date || ""
-                        )}
-
-                    </small>
-
-
-                    <div class="history-actions">
-
-                        <button
-                            onclick="useHistory(${index})">
-
-                            ↻ Use
-
-                        </button>
-
-
-                        <button
-                            onclick="copyHistory(${index})">
-
-                            📋 Copy
-
-                        </button>
-
-
-                        <button
-                            onclick="deleteHistory(${index})">
-
-                            🗑 Delete
-
-                        </button>
-
-                    </div>
+                    <button
+                        onclick="deleteHistory(${index})">
+                        🗑 Delete
+                    </button>
 
                 </div>
 
-                `;
-            }
+            </div>
+        `
         ).join("");
 }
 
@@ -1213,33 +1000,15 @@ function useHistory(index) {
     inputText.value =
         item.original;
 
-
     outputText.value =
         item.translation;
 
 
-    // Only set valid languages
+    sourceLang.value =
+        item.source;
 
-    if (
-        sourceLang.querySelector(
-            `option[value="${item.source}"]`
-        )
-    ) {
-
-        sourceLang.value =
-            item.source;
-    }
-
-
-    if (
-        targetLang.querySelector(
-            `option[value="${item.target}"]`
-        )
-    ) {
-
-        targetLang.value =
-            item.target;
-    }
+    targetLang.value =
+        item.target;
 
 
     charCount.textContent =
@@ -1334,48 +1103,45 @@ function deleteHistory(index) {
 // CLEAR ALL HISTORY
 // ==========================================
 
-if (clearHistory) {
+clearHistory.addEventListener(
+    "click",
+    function () {
 
-    clearHistory.addEventListener(
-        "click",
-        function () {
-
-            const history =
-                JSON.parse(
-                    localStorage.getItem(
-                        "translationHistory"
-                    )
-                ) || [];
+        const history =
+            JSON.parse(
+                localStorage.getItem(
+                    "translationHistory"
+                )
+            ) || [];
 
 
-            if (history.length === 0) {
-
-                showMessage(
-                    "History is already empty",
-                    "There is nothing to delete.",
-                    "info"
-                );
-
-                return;
-            }
-
-
-            localStorage.removeItem(
-                "translationHistory"
-            );
-
-
-            displayHistory();
-
+        if (history.length === 0) {
 
             showMessage(
-                "History cleared",
-                "All translation history has been removed.",
-                "success"
+                "History is already empty",
+                "There is nothing to delete.",
+                "info"
             );
+
+            return;
         }
-    );
-}
+
+
+        localStorage.removeItem(
+            "translationHistory"
+        );
+
+
+        displayHistory();
+
+
+        showMessage(
+            "History cleared",
+            "All translation history has been removed.",
+            "success"
+        );
+    }
+);
 
 
 // ==========================================
@@ -1399,7 +1165,7 @@ function escapeHTML(value) {
 
 
 // ==========================================
-// LOAD HISTORY ON PAGE START
+// LOAD HISTORY WHEN PAGE OPENS
 // ==========================================
 
 displayHistory();
